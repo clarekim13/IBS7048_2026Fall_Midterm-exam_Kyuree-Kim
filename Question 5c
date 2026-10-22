@@ -1,0 +1,23 @@
+condition        <- c("Untreated", "Treated")
+total_reads      <- c(20000000, 20000000)
+host_fraction    <- c(0.99, 0.90)
+taxon_X_fraction <- c(0.10, 0.91)
+
+microbial_reads <- total_reads * (1 - host_fraction)
+
+taxon_X_reads <- microbial_reads * taxon_X_fraction
+non_X_reads   <- microbial_reads - taxon_X_reads
+
+result <- data.frame(condition,
+                     microbial_reads = round(microbial_reads),
+                     taxon_X_reads   = round(taxon_X_reads),
+                     non_X_reads     = round(non_X_reads))
+result
+
+fc <- data.frame(
+  quantity    = c("microbial_reads", "taxon_X_reads", "non_X_reads"),
+  fold_change = round(c(microbial_reads[2] / microbial_reads[1],
+                        taxon_X_reads[2]   / taxon_X_reads[1],
+                        non_X_reads[2]     / non_X_reads[1]), 2)
+)
+fc
