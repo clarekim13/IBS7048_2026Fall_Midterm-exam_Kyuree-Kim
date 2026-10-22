@@ -1,0 +1,23 @@
+BiocManager::install(c("DECIPHER", "phangorn"))
+a
+
+library(DECIPHER)
+library(phangorn)
+
+abund <- colSums(seqtab.nochim)
+top5 <- order(abund, decreasing = TRUE)[1:5]
+seqs <- getSequences(seqtab.nochim)[top5]
+names(seqs) <- paste0("ASV", 1:5)
+abund[top5]
+alignment <-AlignSeqs(DNAStringSet(seqs), anchor = NA)
+phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")
+dm <- dist.ml(phang.align)
+treeNJ <-NJ(dm)
+plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
+
+graphics.off()
+plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
+
+write.tree(treeNJ, file = "top5_ASV_NJ.nwk")
+readLines("top5_ASV_NJ.nwk")
+
