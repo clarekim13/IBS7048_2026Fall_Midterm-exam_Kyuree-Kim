@@ -21,3 +21,60 @@ plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
 write.tree(treeNJ, file = "top5_ASV_NJ.nwk")
 readLines("top5_ASV_NJ.nwk")
 
+
+The output of the following code showed in Console
+
+> seqs <- getSequences(seqtab.nochim)[top5]
+> names(seqs) <- paste0("ASV", 1:5)
+> abund[top5]
+TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTCACTAGACTGTTACTGACACTGATGCTCGAAAGTGTGGGTATCAAACAGG 
+                                                                                                                                                                                                                                                          803 
+TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATGTTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATATCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCCTGCTAAGCTGCAACTGACATTGAGGCTCGAAAGTGTGGGTATCAAACAGG 
+                                                                                                                                                                                                                                                          641 
+TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTCACTAGACTGCAACTGACACTGATGCTCGAAAGTGTGGGTATCAAACAGG 
+                                                                                                                                                                                                                                                          213 
+TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATATTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATATCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCCTGCTAAGCTGCAACTGACATTGAGGCTCGAAAGTGTGGGTATCAAACAGG 
+                                                                                                                                                                                                                                                          116 
+TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACTATTAAGTCAGCTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGTCGTCTTGAGTGCAGTAGAGGTAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTTACTGGACTGTAACTGACGCTGATGCTCGAAAGTGTGGGTATCAAACAGG 
+                                                                                                                                                                                                                                                           87 
+> alignment <-AlignSeqs(DNAStringSet(seqs), anchor = NA)
+Determining distance matrix based on shared 8-mers:
+  |===================================================| 100%
+
+Time difference of 0.01 secs
+
+Clustering into groups by similarity:
+  |===================================================| 100%
+
+Time difference of 0.01 secs
+
+Aligning Sequences:
+  |===================================================| 100%
+
+Time difference of 0.05 secs
+
+Iteration 1 of 2:
+
+Determining distance matrix based on alignment:
+  |===================================================| 100%
+
+Time difference of 0 secs
+
+Reclustering into groups by similarity:
+  |===================================================| 100%
+
+Time difference of 0 secs
+
+Realigning Sequences:
+  |===================================================| 100%
+
+Time difference of 0.02 secs
+
+Alignment converged - skipping remaining iteration.
+> phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")
+> dm <- dist.ml(phang.align)
+> treeNJ <-NJ(dm)
+> plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
+> write.tree(treeNJ, file = "top5_ASV_NJ.nwk")
+> readLines("top5_ASV_NJ.nwk")
+[1] "(ASV3:0.001777328737,ASV1:0.006169765486,((ASV2:0.001981510555,ASV4:0.001981510555):0.05274359164,ASV5:0.02881038519):0.02044440133);"
