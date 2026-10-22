@@ -1,0 +1,31 @@
+ sequencing <- data.frame(
++   platform      = c("Illumina", "Oxford Nanopore", "PacBio HiFi"),
++   yield_Gb      = c(18, 30, 12),
++   host_fraction = c(0.20, 0.70, 0.10),
++   cost_USD      = c(150, 200, 300)
++ )
+> budget <- 600
+> 
+> sequencing$n_samples <- floor(budget / sequencing$cost_USD)
+> # 1) Number of whole samples affordable with one platform
+> #    floor() rounds down, because we cannot buy a fraction of a sample
+> sequencing$n_samples <- floor(budget / sequencing$cost_USD)
+> # 2) Microbial Gb per sample = usable Gb x (1 - host fraction)
+> sequencing$microbial_Gb_per_sample <- sequencing$yield_Gb * (1 - sequencing$host_fraction)
+> # 3) Total microbial Gb = number of samples x microbial Gb per sample
+> sequencing$total_microbial_Gb <- sequencing$n_samples * sequencing$microbial_Gb_per_sample
+> # 4) Money actually spent (to check the budget is not exceeded)
+> sequencing$spent_USD <- sequencing$n_samples * sequencing$cost_USD
+> sequencing
+         platform yield_Gb host_fraction cost_USD
+1        Illumina       18           0.2      150
+2 Oxford Nanopore       30           0.7      200
+3     PacBio HiFi       12           0.1      300
+  n_samples microbial_Gb_per_sample
+1         4                    14.4
+2         3                     9.0
+3         2                    10.8
+  total_microbial_Gb spent_USD
+1               57.6       600
+2               27.0       600
+3               21.6       600
