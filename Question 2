@@ -1,0 +1,49 @@
+IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ cat > sort_R.R << 'EOF'
+# Copy files from raw into sorted_R/<Condition>/<Read>/ using R functions
+if (dir.exists("sorted_R")) unlink("sorted_R", recursive = TRUE)
+files <- list.files("raw", pattern = "\\.fastq$")
+parts <- strsplit(sub("\\.fastq$", "", files), "_")
+condition <- sapply(parts, `[`, 2)
+read      <- sapply(parts, `[`, 4)
+for (i in seq_along(files)) {
+  dest <- file.path("sorted_R", condition[i], read[i])
+  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+  file.copy(file.path("raw", files[i]), file.path(dest, files[i]))
+}
+cat("== Number of files per folder ==\n")
+for (d in sort(list.dirs("sorted_R", recursive = TRUE))) {
+  n <- length(list.files(d, pattern = "\\.fastq$"))
+  if (n > 0) cat(d, ":", n, "\n")
+}
+cat("raw :", length(list.files("raw")), "(originals kept)\n")
+EOF
+IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ cat > compare.R << 'EOF'
+# Compare the Bash and R results
+a <- sort(list.files("sorted_bash", recursive = TRUE))
+b <- sort(list.files("sorted_R",    recursive = TRUE))
+cat("sorted_bash files:", length(a), "\n")
+cat("sorted_R files   :", length(b), "\n")
+cat("Same file paths and names?", identical(a, b), "\n")
+print(rbind(bash = table(dirname(a)), R = table(dirname(b))))
+EOF
+IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ bash sort_bash.sh
+Rscript sort_R.R
+Rscript compare.R
+== 폴더별 파일 수 ==
+sorted_bash/Control/R1 : 10
+sorted_bash/Control/R2 : 10
+sorted_bash/Treated/R1 : 10
+sorted_bash/Treated/R2 : 10
+raw : 40 (원본 유지)
+== Number of files per folder ==
+sorted_R/Control/R1 : 10
+sorted_R/Control/R2 : 10
+sorted_R/Treated/R1 : 10
+sorted_R/Treated/R2 : 10
+raw : 40 (originals kept)
+sorted_bash files: 40
+sorted_R files   : 40
+Same file paths and names? TRUE
+     Control/R1 Control/R2 Treated/R1 Treated/R2
+bash         10         10         10         10
+R            10         10         10         10
