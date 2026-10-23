@@ -1,0 +1,38 @@
+score <- c(0.20, 0.60)
+OR    <- c(estimate = 0.47,  lower = 0.22,  upper = 0.97)
+CASI  <- c(estimate = -0.92, lower = -1.51, upper = -0.33)
+p0    <- 0.40
+
+delta <- score[2] - score[1]
+OR_delta <- exp(log(OR) * delta)
+CASI_delta <- CASI * delta
+odds0 <- p0 / (1 - p0)         
+odds1 <- odds0 * OR_delta      
+p1    <- odds1 / (1 + odds1)
+
+round(OR_delta, 3)
+round(CASI_delta, 3)
+round(p1, 3)
+
+
+The output of the following code showed in Console
+
+ score <- c(0.20, 0.60)
+> OR    <- c(estimate = 0.47,  lower = 0.22,  upper = 0.97)
+> CASI  <- c(estimate = -0.92, lower = -1.51, upper = -0.33)
+> p0    <- 0.40
+> delta <- score[2] - score[1]
+> OR_delta <- exp(log(OR) * delta)
+> CASI_delta <- CASI * delta
+> odds0 <- p0 / (1 - p0)         
+> odds1 <- odds0 * OR_delta      
+> p1    <- odds1 / (1 + odds1)
+> round(OR_delta, 3)
+estimate    lower    upper 
+   0.739    0.546    0.988 
+> round(CASI_delta, 3)
+estimate    lower    upper 
+  -0.368   -0.604   -0.132 
+> round(p1, 3)
+estimate    lower    upper 
+   0.330    0.267    0.397 
