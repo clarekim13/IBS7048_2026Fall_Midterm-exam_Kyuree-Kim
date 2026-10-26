@@ -1,7 +1,7 @@
-score <- c(0.20, 0.60)  
-OR    <- c(estimate = 0.47,  lower = 0.22,  upper = 0.97)
-CASI  <- c(estimate = -0.92, lower = -1.51, upper = -0.33)
-p0    <- 0.40
+score <- c(0.20, 0.60)                                            # initial and new microbiome score
+OR    <- c(estimate = 0.47,  lower = 0.22,  upper = 0.97)         # adjusted OR per 1-unit increase 
+CASI  <- c(estimate = -0.92, lower = -1.51, upper = -0.33)        # adjusted CASI coefficient per 1 unit  
+p0    <- 0.40                                                     # assumed initial symptom probability
 
 
 # 1) change in score
