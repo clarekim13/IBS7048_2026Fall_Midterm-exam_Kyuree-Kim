@@ -10,12 +10,16 @@
 > # 1) Number of whole samples affordable with one platform
 > #    floor() rounds down, because we cannot buy a fraction of a sample
 > sequencing$n_samples <- floor(budget / sequencing$cost_USD)
+
 > # 2) Microbial Gb per sample = usable Gb x (1 - host fraction)
 > sequencing$microbial_Gb_per_sample <- sequencing$yield_Gb * (1 - sequencing$host_fraction)
+
 > # 3) Total microbial Gb = number of samples x microbial Gb per sample
 > sequencing$total_microbial_Gb <- sequencing$n_samples * sequencing$microbial_Gb_per_sample
+
 > # 4) Money actually spent (to check the budget is not exceeded)
 > sequencing$spent_USD <- sequencing$n_samples * sequencing$cost_USD
+
 > sequencing
          platform yield_Gb host_fraction cost_USD
 1        Illumina       18           0.2      150
