@@ -1,15 +1,24 @@
-score <- c(0.20, 0.60)
+score <- c(0.20, 0.60)  
 OR    <- c(estimate = 0.47,  lower = 0.22,  upper = 0.97)
 CASI  <- c(estimate = -0.92, lower = -1.51, upper = -0.33)
 p0    <- 0.40
 
+
+# 1) change in score
 delta <- score[2] - score[1]
+
+# 2) Odds ratio for a 0.4-unit increase
 OR_delta <- exp(log(OR) * delta)
+
+# 3) CASI difference for a 0.4-unit increase
 CASI_delta <- CASI * delta
+
+# 4) New symptom probability for the example child
 odds0 <- p0 / (1 - p0)         
 odds1 <- odds0 * OR_delta      
 p1    <- odds1 / (1 + odds1)
 
+# 5) Results
 round(OR_delta, 3)
 round(CASI_delta, 3)
 round(p1, 3)
