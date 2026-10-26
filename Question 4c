@@ -1,80 +1,99 @@
-BiocManager::install(c("DECIPHER", "phangorn"))
+# BiocManager::install(c("DECIPHER", "phangorn"))
 a
 
 library(DECIPHER)
 library(phangorn)
 
-abund <- colSums(seqtab.nochim)
-top5 <- order(abund, decreasing = TRUE)[1:5]
-seqs <- getSequences(seqtab.nochim)[top5]
-names(seqs) <- paste0("ASV", 1:5)
-abund[top5]
-alignment <-AlignSeqs(DNAStringSet(seqs), anchor = NA)
-phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")
-dm <- dist.ml(phang.align)
-treeNJ <-NJ(dm)
+# ---- 1) Select the five most abundant ASVs ----
+abund <- colSums(seqtab.nochim)                      # total read count of each ASV across both samples
+top5  <- order(abund, decreasing = TRUE)[1:5]        # column indices of the top 5 ASVs
+seqs  <- getSequences(seqtab.nochim)[top5]           # their DNA sequences (dada2 function)
+names(seqs) <- paste0("ASV", 1:5)                    # name them ASV1-ASV5 in decreasing order of abundance
+
+# Show the read count of each selected ASV
+data.frame(ASV = paste0("ASV", 1:5), reads = unname(abund[top5]))
+
+# ---- 2) Multiple sequence alignment with DECIPHER ----
+alignment <- AlignSeqs(DNAStringSet(seqs), anchor = NA)
+
+# ---- 3) Neighbor-joining tree with phangorn ----
+phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")  # convert the alignment to phangorn format
+dm     <- dist.ml(phang.align)                       # pairwise maximum-likelihood distances between ASVs
+treeNJ <- NJ(dm)                                     # build an (unrooted) neighbor-joining tree from the distances
+
+# ---- 4) Plot the tree ----
 plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
 
-graphics.off()
-plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
-
+# ---- 5) Save the tree as a Newick file and check its content ----
 write.tree(treeNJ, file = "top5_ASV_NJ.nwk")
 readLines("top5_ASV_NJ.nwk")
 
 
 The output of the following code showed in Console
 
-> seqs <- getSequences(seqtab.nochim)[top5]
-> names(seqs) <- paste0("ASV", 1:5)
-> abund[top5]
-TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTCACTAGACTGTTACTGACACTGATGCTCGAAAGTGTGGGTATCAAACAGG 
-                                                                                                                                                                                                                                                          803 
-TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATGTTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATATCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCCTGCTAAGCTGCAACTGACATTGAGGCTCGAAAGTGTGGGTATCAAACAGG 
-                                                                                                                                                                                                                                                          641 
-TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTGGATTGTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGAAACTGGCAGTCTTGAGTACAGTAGAGGTGGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTCACTAGACTGCAACTGACACTGATGCTCGAAAGTGTGGGTATCAAACAGG 
-                                                                                                                                                                                                                                                          213 
-TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGATGGATATTTAAGTCAGTTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGATATCTTGAGTGCAGTTGAGGCAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCCTGCTAAGCTGCAACTGACATTGAGGCTCGAAAGTGTGGGTATCAAACAGG 
-                                                                                                                                                                                                                                                          116 
-TACGGAGGATCCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGCGGACTATTAAGTCAGCTGTGAAAGTTTGCGGCTCAACCGTAAAATTGCAGTTGATACTGGTCGTCTTGAGTGCAGTAGAGGTAGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCGATTGCGAAGGCAGCTTACTGGACTGTAACTGACGCTGATGCTCGAAAGTGTGGGTATCAAACAGG 
-                                                                                                                                                                                                                                                           87 
-> alignment <-AlignSeqs(DNAStringSet(seqs), anchor = NA)
+> library(DECIPHER)
+> library(phangorn)
+> # ---- 1) Select the five most abundant ASVs ----
+> abund <- colSums(seqtab.nochim)                      # total read count of each ASV across both samples
+> top5  <- order(abund, decreasing = TRUE)[1:5]        # column indices of the top 5 ASVs
+> seqs  <- getSequences(seqtab.nochim)[top5]           # their DNA sequences (dada2 function)
+> names(seqs) <- paste0("ASV", 1:5)                    # name them ASV1-ASV5 in decreasing order of abundance
+
+> # Show the read count of each selected ASV
+> data.frame(ASV = paste0("ASV", 1:5), reads = unname(abund[top5]))
+   ASV reads
+1 ASV1   803
+2 ASV2   641
+3 ASV3   213
+4 ASV4   116
+5 ASV5    87
+
+> # ---- 2) Multiple sequence alignment with DECIPHER ----
+> alignment <- AlignSeqs(DNAStringSet(seqs), anchor = NA)
 Determining distance matrix based on shared 8-mers:
-  |===================================================| 100%
+  |=============================================| 100%
 
 Time difference of 0.01 secs
 
 Clustering into groups by similarity:
-  |===================================================| 100%
+  |=============================================| 100%
 
 Time difference of 0.01 secs
 
 Aligning Sequences:
-  |===================================================| 100%
+  |=============================================| 100%
 
-Time difference of 0.05 secs
+Time difference of 0.08 secs
 
 Iteration 1 of 2:
 
 Determining distance matrix based on alignment:
-  |===================================================| 100%
+  |=============================================| 100%
 
 Time difference of 0 secs
 
 Reclustering into groups by similarity:
-  |===================================================| 100%
+  |=============================================| 100%
 
-Time difference of 0 secs
+Time difference of 0.01 secs
 
 Realigning Sequences:
-  |===================================================| 100%
+  |=============================================| 100%
 
-Time difference of 0.02 secs
+Time difference of 0.05 secs
 
 Alignment converged - skipping remaining iteration.
-> phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")
-> dm <- dist.ml(phang.align)
-> treeNJ <-NJ(dm)
+
+> # ---- 3) Neighbor-joining tree with phangorn ----
+> phang.align <- phyDat(as(alignment, "matrix"), type = "DNA")  # convert the alignment to phangorn format
+> dm     <- dist.ml(phang.align)                       # pairwise maximum-likelihood distances between ASVs
+> treeNJ <- NJ(dm)                                     # build an (unrooted) neighbor-joining tree from the distances
+
+> # ---- 4) Plot the tree ----
 > plot(treeNJ, main = "Neighbor-joining tree of the top 5 ASVs")
+
+> # ---- 5) Save the tree as a Newick file and check its content ----
 > write.tree(treeNJ, file = "top5_ASV_NJ.nwk")
 > readLines("top5_ASV_NJ.nwk")
 [1] "(ASV3:0.001777328737,ASV1:0.006169765486,((ASV2:0.001981510555,ASV4:0.001981510555):0.05274359164,ASV5:0.02881038519):0.02044440133);"
+> 
