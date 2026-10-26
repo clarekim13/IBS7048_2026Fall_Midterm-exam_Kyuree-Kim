@@ -16,33 +16,37 @@ IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ for sample in S01 S02 S03 S04 S05
 IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ ls raw | wc -l
 40
 IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ cat > sort_bash.sh << 'EOF'
+
 #!/bin/bash
-# raw -> sorted_bash/<Condition>/<Read>/ 로 복사 (원본 유지)
-rm -rf sorted_bash
-for f in raw/*.fastq
+# Copy FASTQ files from raw/ into sorted_bash/<Condition>/<Read>/
+# Original files are kept in raw/ for Problem 2
+
+rm -rf sorted_bash                                   # remove old results so the script can be re-run clearly
+for f in raw/*.fastq                                 # loop over every FASTQ file in raw/
 do
-  name=$(basename "$f")                              # 파일명만 추출
-  condition=$(echo "$name" | cut -d_ -f2)            # Control / Treated
-  read=$(echo "$name" | cut -d_ -f4 | cut -d. -f1)   # R1 / R2
-  mkdir -p "sorted_bash/$condition/$read"            # 폴더 생성
-  cp "$f" "sorted_bash/$condition/$read/"            # 복사 (원본 유지)
+  name=$(basename "$f")                              # keep only the file name (drop "raw/")
+  condition=$(echo "$name" | cut -d_ -f2)            # split by "_": Control / Treated
+  read=$(echo "$name" | cut -d_ -f4 | cut -d. -f1)   # without ".fastq": R1 / R2
+  mkdir -p "sorted_bash/$condition/$read"            # create the target folder
+  cp "$f" "sorted_bash/$condition/$read/"            # copy with the same filename (original stays in raw/)
 done
 
-echo "== 폴더별 파일 수 =="
+# report the number of files in each folder
+echo "== Number of files per folder =="
 for d in sorted_bash/*/*
 do
   echo "$d : $(ls "$d" | wc -l)"
 done
-echo "raw : $(ls raw | wc -l) (원본 유지)"
+echo "raw : $(ls raw | wc -l) (orignals kept)"
 EOF
 
 IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ bash sort_bash.sh
-== 폴더별 파일 수 ==
+== Number of files per folder ==
 sorted_bash/Control/R1 : 10
 sorted_bash/Control/R2 : 10
 sorted_bash/Treated/R1 : 10
 sorted_bash/Treated/R2 : 10
-raw : 40 (원본 유지)
+raw : 40 (orignals kept)
 
 IBS7054_22262021@bagel-S2600CO:~/IBS7048_2026$ find sorted_bash -type f | wc -l      # 40
 find sorted_bash -type f | sort | head -4
