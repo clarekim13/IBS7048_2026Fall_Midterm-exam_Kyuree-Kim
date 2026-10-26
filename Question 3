@@ -6,7 +6,7 @@
 + )
 > budget <- 600
 > 
-> sequencing$n_samples <- floor(budget / sequencing$cost_USD)
+>
 > # 1) Number of whole samples affordable with one platform
 > #    floor() rounds down, because we cannot buy a fraction of a sample
 > sequencing$n_samples <- floor(budget / sequencing$cost_USD)
